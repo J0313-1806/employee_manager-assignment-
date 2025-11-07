@@ -298,8 +298,6 @@ class _DatePickerDialogContentState extends State<_DatePickerDialogContent> {
           });
         },
         selectableDayPredicate: (date) {
-          print('init: $dateToHighlight');
-          print(' _startDate: $_startDate');
           if (_startDate != null) {
             return date.isAfter(_startDate!);
           } else {

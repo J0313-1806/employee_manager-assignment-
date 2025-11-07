@@ -43,7 +43,6 @@ class SelectionCubit extends Cubit<SelectionState> {
   }
 
   void startDate(String value) {
-    print(value);
     emit(state.copyWith(startDate: value));
   }
 

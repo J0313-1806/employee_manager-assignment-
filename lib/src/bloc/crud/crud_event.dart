@@ -1,26 +1,46 @@
 part of 'crud_bloc.dart';
 
 @immutable
-sealed class CrudEvent {}
+class CrudEvent extends Equatable {
+  @override
+  List<Object?> get props => [];
+}
 
-class LoadEmployees extends CrudEvent {}
+class LoadEmployees extends CrudEvent {
+  
+  LoadEmployees();
+  
+  @override
+  List<Object?> get props => [];
+}
 
 class AddEmployee extends CrudEvent {
   final EmployeeModel employee;
   AddEmployee(this.employee);
+  
+  @override
+  List<Object?> get props => [employee];
 }
 
 class UpdateEmployee extends CrudEvent {
   final EmployeeModel employee;
   UpdateEmployee(this.employee);
+  
+  @override
+  List<Object?> get props => [employee];
 }
 
 class DeleteEmployee extends CrudEvent {
-  final int id;
+  final String id;
   DeleteEmployee(this.id);
+  
+  @override
+  List<Object?> get props => [id];
 }
 
-class PositionSelected extends CrudEvent {
-  final String position;
-  PositionSelected(this.position);
+class DataUpdated extends CrudEvent {
+  final List<EmployeeModel> employees;
+  DataUpdated(this.employees);
+  @override
+  List<Object?> get props => [employees];
 }
