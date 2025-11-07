@@ -19,3 +19,8 @@ class DeleteEmployee extends CrudEvent {
   final int id;
   DeleteEmployee(this.id);
 }
+
+class PositionSelected extends CrudEvent {
+  final String position;
+  PositionSelected(this.position);
+}

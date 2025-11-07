@@ -1,4 +1,5 @@
-import 'package:employee_manager/src/bloc/crud_bloc.dart';
+import 'package:employee_manager/src/bloc/crud/crud_bloc.dart';
+import 'package:employee_manager/src/bloc/sheet_select/sheet_select.dart';
 import 'package:employee_manager/src/screen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,10 +14,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Todo CRUD BLoC',
+      debugShowCheckedModeBanner: false,
+      title: 'Employee Manager',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: BlocProvider(
-        create: (context) => CrudBloc(),//..add(LoadTodos()
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<CrudBloc>(
+            create: (context) => CrudBloc()..add(LoadEmployees()),
+          ),
+          BlocProvider<SelectionCubit>(
+            create: (context) => SelectionCubit(),
+          ),
+        ],
         child: const HomeScreen(),
       ),
     );
