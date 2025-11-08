@@ -1,0 +1,21 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # The branch you push your source code to
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy Flutter App
+        uses: bluefireteam/flutter-gh-pages@v4
+        with:
+          # CRITICAL: Replace 'your_repository_name' with your actual repo name
+          baseHref: /your_repository_name/ 
+          # The token is automatically available
+          token: ${{ secrets.GITHUB_TOKEN }}
