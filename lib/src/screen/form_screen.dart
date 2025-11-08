@@ -1,35 +1,58 @@
 import 'package:employee_manager/src/bloc/crud/crud_bloc.dart';
-import 'package:employee_manager/src/bloc/sheet_select/sheet_select.dart';
+import 'package:employee_manager/src/bloc/form_cubit/form_cubit_state_file.dart';
 import 'package:employee_manager/src/model/employee_model.dart';
 import 'package:employee_manager/src/widget/bottom_select.dart';
 import 'package:employee_manager/src/widget/calender_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 
-class FormScreen extends StatelessWidget {
-  const FormScreen({super.key});
+class FormScreen extends StatefulWidget {
+  const FormScreen({super.key, this.employeeModel});
+
+  final EmployeeModel? employeeModel;
+
+  @override
+  State<FormScreen> createState() => _FormScreenState();
+}
+
+class _FormScreenState extends State<FormScreen> {
+
+  late final TextEditingController _nameController;
+
+   @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.employeeModel?.name ?? '');
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (crudContext) => CrudBloc(),
-      child: BlocProvider<SelectionCubit>(
-        create: (_) => SelectionCubit(),
+    return BlocProvider.value(
+      value: context.read<CrudBloc>(),
+      child: BlocProvider<FormCubit>(
+        create: (_) => FormCubit()
+          ..nameField(widget.employeeModel?.name ?? '')
+          ..startDate(widget.employeeModel?.startDate ?? 'Start Date')
+          ..endDate(widget.employeeModel?.endDate ?? 'End Date')
+          ..selectOption(widget.employeeModel?.role ?? 'Select Position'),
         child: BlocConsumer<CrudBloc, CrudState>(
-          listener: (context, state) {
-            // TODO: implement listener
-          },
+          listener: (context, state) {},
+          buildWhen: (previous, current) => current is DataLoaded,
           builder: (context, state) {
-            return BlocConsumer<SelectionCubit, SelectionState>(
-              listener: (context, state) {
-                // _positionController.text = state.selectedValue;
-                // state.startDate;
-                // state.endDate;
-              },
+            return BlocConsumer<FormCubit, FormScreenState>(
+              listener: (context, state) {},
               builder: (context, state) {
                 return Scaffold(
+                  resizeToAvoidBottomInset: true,
                   appBar: AppBar(
                     title: Text('Add Employee Details'),
                     actions: [
@@ -45,6 +68,8 @@ class FormScreen extends StatelessWidget {
                     padding: EdgeInsets.all(16.0),
                     children: [
                       TextField(
+                        focusNode: FocusNode(),
+                        controller: _nameController,
                         decoration: InputDecoration(
                           labelText: 'Name',
                           prefixIcon: Icon(Icons.person_outlined),
@@ -58,7 +83,7 @@ class FormScreen extends StatelessWidget {
                           ),
                         ),
                         onChanged: (value) =>
-                            context.read<SelectionCubit>().nameField(value),
+                            context.read<FormCubit>().nameField(value),
                       ),
                       SizedBox(height: 20),
                       postionSelector(context, state),
@@ -77,93 +102,108 @@ class FormScreen extends StatelessWidget {
                     ],
                   ),
 
-                  bottomNavigationBar: Container(
-                    padding: EdgeInsets.fromLTRB(0.0, 16.0, 16.0, 26.0),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        top: BorderSide(color: Colors.grey.shade300),
-                      ),
+                  bottomNavigationBar: Padding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurple.shade50,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6.0),
-                            ),
-                          ),
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(color: Colors.deepPurple.shade400),
-                          ),
+                    child: Container(
+                      padding: EdgeInsets.fromLTRB(0.0, 10.0, 16.0, 12.0),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(color: Colors.grey.shade300),
                         ),
-                        const SizedBox(width: 16.0),
-                        ElevatedButton(
-                          onPressed: () {
-                            context.read<CrudBloc>().add(
-                              AddEmployee(
-                                EmployeeModel(
-                                  id: DateTime.now().millisecondsSinceEpoch
-                                      .toString(),
-                                  name: context
-                                      .read<SelectionCubit>()
-                                      .state
-                                      .name,
-                                  role: context
-                                      .read<SelectionCubit>()
-                                      .state
-                                      .position,
-                                  duration:
-                                      !context
-                                          .read<SelectionCubit>()
-                                          .state
-                                          .endDate
-                                          .contains('2')
-                                      ? context
-                                            .read<SelectionCubit>()
-                                            .state
-                                            .startDate
-                                      : '${context.read<SelectionCubit>().state.startDate} - ${context.read<SelectionCubit>().state.endDate}',
-                                  active:
-                                      context
-                                          .read<SelectionCubit>()
-                                          .state
-                                          .endDate
-                                          .contains('2')
-                                      ? DateFormat('dd MMM yyyy')
-                                                .parseStrict(
-                                                  context
-                                                      .read<SelectionCubit>()
-                                                      .state
-                                                      .endDate,
-                                                )
-                                                .isBefore(DateTime.now())
-                                            ? false
-                                            : true
-                                      : true,
-                                ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.deepPurple.shade50,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6.0),
                               ),
-                            );
-                            Navigator.pop(context);
-                          },
-
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurple.shade400,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6.0),
+                            ),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                color: Colors.deepPurple.shade400,
+                              ),
                             ),
                           ),
-                          child: Text(
-                            'Save',
-                            style: TextStyle(color: Colors.white),
+                          const SizedBox(width: 16.0),
+                          ElevatedButton(
+                            onPressed: () {
+                              final formState = context.read<FormCubit>().state;
+                              if (formState.name.isEmpty ||
+                                  formState.position == 'Select Position' ||
+                                  formState.startDate.contains('Start')) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Please fill all required fields',
+                                    ),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                                return;
+                              }
+
+                              final isActive = !formState.endDate.contains('2')
+                                  ? true
+                                  : !DateFormat('dd MMM yyyy')
+                                        .parseStrict(formState.endDate)
+                                        .isBefore(DateTime.now());
+
+                              final employee = EmployeeModel(
+                                id:
+                                    widget.employeeModel?.id ??
+                                    DateTime.now().millisecondsSinceEpoch
+                                        .toString(),
+                                name: formState.name.isEmpty
+                                    ? widget.employeeModel!.name
+                                    : formState.name,
+                                role: formState.position == 'Select Position'
+                                    ? widget.employeeModel?.role ?? ''
+                                    : formState.position,
+                                startDate: formState.startDate.contains('Start')
+                                    ? widget.employeeModel!.startDate
+                                    : formState.startDate,
+                                endDate: formState.endDate.contains('End')
+                                    ? widget.employeeModel?.endDate ?? ''
+                                    : formState.endDate,
+                                active: isActive,
+                              );
+
+                              if (widget.employeeModel == null) {
+                                // Add new employee
+                                context.read<CrudBloc>().add(
+                                  AddEmployee(employee),
+                                );
+                              } else {
+                                // Update existing employee
+                                context.read<CrudBloc>().add(
+                                  UpdateEmployee(employee),
+                                );
+                              }
+                              Navigator.pop(context);
+                            },
+
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.deepPurple.shade400,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6.0),
+                              ),
+                            ),
+                            child: Text(
+                              'Save',
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -177,32 +217,53 @@ class FormScreen extends StatelessWidget {
 
   InkWell dateSelector(
     BuildContext context,
-    SelectionState state,
+    FormScreenState state,
     bool isStart,
   ) {
+
+    final displayDate = isStart
+      ? (state.startDate != 'Start Date' 
+          ? state.startDate 
+          : widget.employeeModel?.startDate ?? 'Start Date')
+      : (state.endDate != 'End Date'
+          ? state.endDate
+          : widget.employeeModel?.endDate ?? 'End Date');
+
     return InkWell(
       onTap: () {
-        showCustomDatePicker(
-          context: context,
-          isStart: isStart,
-          initialDate: DateTime.now(),
-          startDate: !isStart && !state.startDate.contains('S')
-              ? DateFormat('dd MMM yyyy').parseStrict(state.startDate)
-              : null,
-          onSave: (newDate) {
-            if (isStart) {
-              context.read<SelectionCubit>().startDate(
-                DateFormat('dd MMM yyyy').format(newDate),
-              );
-            } else {
-              newDate != null
-                  ? context.read<SelectionCubit>().endDate(
-                      DateFormat('dd MMM yyyy').format(newDate),
-                    )
-                  : context.read<SelectionCubit>().endDate('End Date');
-            }
-          },
-        );
+        if (state.startDate.contains('S') && !isStart) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text('Select Start Date first!'),
+                backgroundColor: Colors.black,
+                duration: const Duration(seconds: 2),
+              ),
+            );
+        } else {
+          showCustomDatePicker(
+            context: context,
+            isStart: isStart,
+            initialDate: DateTime.now(),
+            startDate: !isStart && !state.startDate.contains('S')
+                ? DateFormat('dd MMM yyyy').parseStrict(state.startDate)
+                : null,
+            onSave: (newDate) {
+              if (isStart) {
+                context.read<FormCubit>().startDate(
+                  DateFormat('dd MMM yyyy').format(newDate),
+                );
+              } else {
+                newDate != null
+                    ? context.read<FormCubit>().endDate(
+                        DateFormat('dd MMM yyyy').format(newDate),
+                      )
+                    : context.read<FormCubit>().endDate('End Date');
+              }
+            },
+          );
+        }
       },
       child: Container(
         width: MediaQuery.of(context).size.width * 0.4,
@@ -217,8 +278,9 @@ class FormScreen extends StatelessWidget {
             Icon(Icons.calendar_month_outlined),
             SizedBox(width: 16.0),
             Text(
-              isStart ? state.startDate : state.endDate,
-              style: TextStyle(color: Colors.black),
+              displayDate,
+              style: const TextStyle(color: Colors.black),
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -226,9 +288,10 @@ class FormScreen extends StatelessWidget {
     );
   }
 
-  Widget postionSelector(BuildContext context, SelectionState state) {
+  Widget postionSelector(BuildContext context, FormScreenState state) {
     return InkWell(
       onTap: () {
+        SystemChannels.textInput.invokeMethod('TextInput.hide');
         bottomSelect(context);
       },
       child: Container(

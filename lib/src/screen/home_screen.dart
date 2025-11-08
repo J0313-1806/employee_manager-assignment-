@@ -36,24 +36,27 @@ class HomeScreen extends StatelessWidget {
             var previousEmp = employees.where((e) => !e.active).toList();
             var currentEmp = employees.where((e) => e.active).toList();
 
-            return Column(
-              children: [
-                currentEmp.isNotEmpty
-                    ? employeeListWidget(
-                        currentEmp,
-                        title: 'Current Employees',
-                        context: context,
-                      )
-                    : SizedBox.shrink(),
-
-                previousEmp.isNotEmpty
-                    ? employeeListWidget(
-                        previousEmp,
-                        title: 'Previous Employees',
-                        context: context,
-                      )
-                    : SizedBox.shrink(),
-              ],
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  currentEmp.isNotEmpty
+                      ? employeeListWidget(
+                          currentEmp,
+                          title: 'Current Employees',
+                          context: context,
+                        )
+                      : SizedBox.shrink(),
+              
+                  previousEmp.isNotEmpty
+                      ? employeeListWidget(
+                          previousEmp,
+                          title: 'Previous Employees',
+                          context: context,
+                        )
+                      : SizedBox.shrink(),
+                ],
+              ),
             );
           } else if (state is LoadError) {
             return Center(child: Text('Error: ${state.message}'));
@@ -96,6 +99,7 @@ class HomeScreen extends StatelessWidget {
         ListView.builder(
           key: Key('$title list'),
           shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
           itemCount: employees.length,
           itemBuilder: (context, index) {
             final employee = employees[index];
