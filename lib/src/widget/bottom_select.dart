@@ -28,7 +28,7 @@ Future<dynamic> bottomSelect(BuildContext context) {
                             ];
                             final position = positions[index];
                             return ListTile(
-                              title: Text(position),
+                              title: Center(child: Text(position)),
                               onTap: () {
                                 context.read<FormCubit>().selectOption(
                                   position,

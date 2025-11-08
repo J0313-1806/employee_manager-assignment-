@@ -6,12 +6,12 @@ import 'package:employee_manager/src/widget/calender_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 
 class FormScreen extends StatefulWidget {
-  const FormScreen({super.key, this.employeeModel});
+  const FormScreen({super.key, required this.titleText, this.employeeModel});
 
+  final String titleText;
   final EmployeeModel? employeeModel;
 
   @override
@@ -19,13 +19,14 @@ class FormScreen extends StatefulWidget {
 }
 
 class _FormScreenState extends State<FormScreen> {
-
   late final TextEditingController _nameController;
 
-   @override
+  @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.employeeModel?.name ?? '');
+    _nameController = TextEditingController(
+      text: widget.employeeModel?.name ?? '',
+    );
   }
 
   @override
@@ -54,14 +55,22 @@ class _FormScreenState extends State<FormScreen> {
                 return Scaffold(
                   resizeToAvoidBottomInset: true,
                   appBar: AppBar(
-                    title: Text('Add Employee Details'),
+                    title: Text(widget.titleText),
                     actions: [
-                      IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () {
-                          Hive.box<EmployeeModel>('employees').clear();
-                        },
-                      ),
+                      widget.employeeModel != null
+                          ? IconButton(
+                              icon: Icon(
+                                Icons.delete_outline,
+                                color: Colors.deepPurple.shade400,
+                              ),
+                              onPressed: () {
+                                context.read<CrudBloc>().add(
+                                  DeleteEmployee(widget.employeeModel!.id),
+                                );
+                                Navigator.pop(context);
+                              },
+                            )
+                          : SizedBox.shrink(),
                     ],
                   ),
                   body: ListView(
@@ -94,7 +103,7 @@ class _FormScreenState extends State<FormScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             dateSelector(context, state, true),
-                            Icon(Icons.arrow_forward_rounded),
+                            Icon(Icons.arrow_forward_rounded, color: Colors.deepPurple.shade300,),
                             dateSelector(context, state, false),
                           ],
                         ),
@@ -220,14 +229,13 @@ class _FormScreenState extends State<FormScreen> {
     FormScreenState state,
     bool isStart,
   ) {
-
     final displayDate = isStart
-      ? (state.startDate != 'Start Date' 
-          ? state.startDate 
-          : widget.employeeModel?.startDate ?? 'Start Date')
-      : (state.endDate != 'End Date'
-          ? state.endDate
-          : widget.employeeModel?.endDate ?? 'End Date');
+        ? (state.startDate != 'Start Date'
+              ? state.startDate
+              : widget.employeeModel?.startDate ?? 'Start Date')
+        : (state.endDate != 'End Date'
+              ? state.endDate
+              : widget.employeeModel?.endDate ?? 'End Date');
 
     return InkWell(
       onTap: () {

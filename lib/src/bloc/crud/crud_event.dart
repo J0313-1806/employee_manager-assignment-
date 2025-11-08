@@ -7,9 +7,8 @@ class CrudEvent extends Equatable {
 }
 
 class LoadEmployees extends CrudEvent {
-  
   LoadEmployees();
-  
+
   @override
   List<Object?> get props => [];
 }
@@ -17,7 +16,7 @@ class LoadEmployees extends CrudEvent {
 class AddEmployee extends CrudEvent {
   final EmployeeModel employee;
   AddEmployee(this.employee);
-  
+
   @override
   List<Object?> get props => [employee];
 }
@@ -25,7 +24,7 @@ class AddEmployee extends CrudEvent {
 class UpdateEmployee extends CrudEvent {
   final EmployeeModel employee;
   UpdateEmployee(this.employee);
-  
+
   @override
   List<Object?> get props => [employee];
 }
@@ -33,7 +32,7 @@ class UpdateEmployee extends CrudEvent {
 class DeleteEmployee extends CrudEvent {
   final String id;
   DeleteEmployee(this.id);
-  
+
   @override
   List<Object?> get props => [id];
 }

@@ -6,9 +6,14 @@ import 'package:employee_manager/src/screen/form_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +52,7 @@ class HomeScreen extends StatelessWidget {
                           context: context,
                         )
                       : SizedBox.shrink(),
-              
+
                   previousEmp.isNotEmpty
                       ? employeeListWidget(
                           previousEmp,
@@ -66,9 +71,12 @@ class HomeScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => const FormScreen()));
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) =>
+                  const FormScreen(titleText: 'Add Employee Details'),
+            ),
+          );
         },
         child: const Icon(Icons.add),
       ),
@@ -106,7 +114,29 @@ class HomeScreen extends StatelessWidget {
             return Dismissible(
               key: UniqueKey(),
               onDismissed: (direction) {
-                context.read<CrudBloc>().add(DeleteEmployee(employee.id));
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text('Employee data has been deleted'),
+                      backgroundColor: Colors.black,
+                      duration: const Duration(seconds: 3),
+                      action: SnackBarAction(
+                        label: 'Undo',
+                        textColor: Colors.white,
+                        onPressed: () {
+                          setState(() {
+                            employees.insert(index, employee);
+                          });
+                        },
+                      ),
+                    ),
+                  ).closed.then((reason) {
+                    // Only delete if snackbar timed out (not undone)
+                    if (reason == SnackBarClosedReason.timeout) {
+                      context.read<CrudBloc>().add(DeleteEmployee(employee.id));
+                    }
+                  });
               },
               background: Container(
                 padding: EdgeInsets.symmetric(horizontal: 15),
@@ -138,7 +168,10 @@ class HomeScreen extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (_) => FormScreen(employeeModel: employee),
+                      builder: (_) => FormScreen(
+                        titleText: 'Edit Employee Details',
+                        employeeModel: employee,
+                      ),
                     ),
                   );
                 },
