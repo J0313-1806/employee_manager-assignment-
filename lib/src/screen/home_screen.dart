@@ -41,25 +41,36 @@ class _HomeScreenState extends State<HomeScreen> {
             var previousEmp = employees.where((e) => !e.active).toList();
             var currentEmp = employees.where((e) => e.active).toList();
 
-            return SingleChildScrollView(
+            return Container(
+              // color: Colors.deepPurple.shade50,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  currentEmp.isNotEmpty
-                      ? employeeListWidget(
-                          currentEmp,
-                          title: 'Current Employees',
-                          context: context,
-                        )
-                      : SizedBox.shrink(),
+                  if (currentEmp.isNotEmpty) ...[
+                    displayTitle('Current Employees'),
+                    employeeListWidget(
+                      currentEmp,
+                      title: 'Current Employees',
+                      context: context,
+                    ),
+                  ],
 
-                  previousEmp.isNotEmpty
-                      ? employeeListWidget(
-                          previousEmp,
-                          title: 'Previous Employees',
-                          context: context,
-                        )
-                      : SizedBox.shrink(),
+                  if (previousEmp.isNotEmpty) ...[
+                    displayTitle('Previous Employees'),
+                    employeeListWidget(
+                      previousEmp,
+                      title: 'Previous Employees',
+                      context: context,
+                    ),
+                  ],
+                  Container(
+                    padding: const EdgeInsets.all(15),
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Swipe to delete',
+                      style: TextStyle(color: Colors.deepPurple.shade400),
+                    ),
+                  ),
                 ],
               ),
             );
@@ -83,103 +94,104 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Column employeeListWidget(
+  Widget employeeListWidget(
     List<EmployeeModel> employees, {
     required String title,
     required BuildContext context,
   }) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(14.0),
-          decoration: BoxDecoration(color: Colors.grey.shade300),
-          child: Text(
-            title,
-            style: TextStyle(
-              color: Colors.deepPurple.shade400,
-              fontWeight: FontWeight.bold,
-              fontSize: 18.0,
+    final double height = MediaQuery.of(context).size.height;
+    return Container(
+      color: Colors.white,
+      height: height / 2.8,
+      width: double.infinity,
+      child: ListView.separated(
+        key: Key('$title list'),
+        physics: const BouncingScrollPhysics(),
+        itemCount: employees.length,
+        itemBuilder: (context, index) {
+          final employee = employees[index];
+          return Dismissible(
+            key: UniqueKey(),
+            onDismissed: (direction) {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text('Employee data has been deleted'),
+                    backgroundColor: Colors.black,
+                    duration: const Duration(seconds: 2),
+                    action: SnackBarAction(
+                      label: 'Undo',
+                      textColor: Colors.white,
+                      onPressed: () {
+                        setState(() {
+                          employees.insert(index, employee);
+                        });
+                      },
+                    ),
+                  ),
+                ).closed.then((reason) {
+                  // Only delete if snackbar timed out (not undone)
+                  if (reason == SnackBarClosedReason.timeout) {
+                    context.read<CrudBloc>().add(DeleteEmployee(employee.id));
+                  }
+                });
+            },
+            background: Container(
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              color: Colors.red,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.delete_outline, color: Colors.white),
+                  Icon(Icons.delete_outline, color: Colors.white),
+                ],
+              ),
             ),
-          ),
-        ),
-        ListView.builder(
-          key: Key('$title list'),
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: employees.length,
-          itemBuilder: (context, index) {
-            final employee = employees[index];
-            return Dismissible(
-              key: UniqueKey(),
-              onDismissed: (direction) {
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text('Employee data has been deleted'),
-                      backgroundColor: Colors.black,
-                      duration: const Duration(seconds: 3),
-                      action: SnackBarAction(
-                        label: 'Undo',
-                        textColor: Colors.white,
-                        onPressed: () {
-                          setState(() {
-                            employees.insert(index, employee);
-                          });
-                        },
-                      ),
+            child: ListTile(
+              key: Key('$title $index'),
+              title: Text(employee.name),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(employee.role),
+                  const SizedBox(height: 4),
+                  Text('${employee.startDate} - ${employee.endDate}'),
+                ],
+              ),
+              
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => FormScreen(
+                      titleText: 'Edit Employee Details',
+                      employeeModel: employee,
                     ),
-                  ).closed.then((reason) {
-                    // Only delete if snackbar timed out (not undone)
-                    if (reason == SnackBarClosedReason.timeout) {
-                      context.read<CrudBloc>().add(DeleteEmployee(employee.id));
-                    }
-                  });
+                  ),
+                );
               },
-              background: Container(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                color: Colors.red,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.delete_outline, color: Colors.white),
-                    Icon(Icons.delete_outline, color: Colors.white),
-                  ],
-                ),
-              ),
-              child: ListTile(
-                key: Key('$title $index'),
-                title: Text(employee.name),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(employee.role),
-                    const SizedBox(height: 4),
-                    Text('${employee.startDate} - ${employee.endDate}'),
-                  ],
-                ),
-                shape: Border(
-                  top: BorderSide(color: Colors.grey.shade300),
-                  bottom: BorderSide(color: Colors.grey.shade300),
-                ),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => FormScreen(
-                        titleText: 'Edit Employee Details',
-                        employeeModel: employee,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            );
-          },
+            ),
+          );
+        }, separatorBuilder: (BuildContext context, int index) { 
+          return Divider(color: Colors.purple.shade50,);
+         },
+      ),
+    );
+  }
+
+  Container displayTitle(String title) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14.0),
+      child: Text(
+        title,
+        style: TextStyle(
+          color: Colors.deepPurple.shade400,
+          fontWeight: FontWeight.bold,
+          fontSize: 18.0,
         ),
-      ],
+      ),
     );
   }
 }
