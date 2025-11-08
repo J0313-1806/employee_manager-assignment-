@@ -1,4 +1,4 @@
-import 'package:employee_manager/src/bloc/sheet_select/sheet_select.dart';
+import 'package:employee_manager/src/bloc/form_cubit/form_cubit_state_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -12,7 +12,7 @@ Future<dynamic> bottomSelect(BuildContext context) {
                     ),
                     builder: (sheetContext) {
                       return BlocProvider.value(
-                        value: context.read<SelectionCubit>(),
+                        value: context.read<FormCubit>(),
                         child: ListView.separated(
                           shrinkWrap: true,
                           padding: EdgeInsets.symmetric(vertical: 16.0),
@@ -30,7 +30,7 @@ Future<dynamic> bottomSelect(BuildContext context) {
                             return ListTile(
                               title: Text(position),
                               onTap: () {
-                                context.read<SelectionCubit>().selectOption(
+                                context.read<FormCubit>().selectOption(
                                   position,
                                 );
 

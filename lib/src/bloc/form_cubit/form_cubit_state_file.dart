@@ -1,25 +1,25 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class SelectionState extends Equatable {
+class FormScreenState extends Equatable {
   final String name;
   final String position;
   final String startDate;
   final String endDate;
-  const SelectionState({
+  const FormScreenState({
     this.name = 'Name',
     this.position = 'Position',
     this.startDate = 'Start Date',
     this.endDate = 'End Date',
   });
 
-  SelectionState copyWith({
+  FormScreenState copyWith({
     String? name,
     String? position,
     String? startDate,
     String? endDate,
   }) {
-    return SelectionState(
+    return FormScreenState(
       name: name ?? this.name,
       position: position ?? this.position,
       startDate: startDate ?? this.startDate,
@@ -31,8 +31,8 @@ class SelectionState extends Equatable {
   List<Object?> get props => [name, position, startDate, endDate];
 }
 
-class SelectionCubit extends Cubit<SelectionState> {
-  SelectionCubit() : super(SelectionState());
+class FormCubit extends Cubit<FormScreenState> {
+  FormCubit() : super(FormScreenState());
 
   void nameField(String value) {
     emit(state.copyWith(name: value));

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:employee_manager/src/bloc/crud/crud_bloc.dart';
 import 'package:employee_manager/src/model/employee_model.dart';
 import 'package:employee_manager/src/screen/form_screen.dart';
@@ -56,7 +58,7 @@ class HomeScreen extends StatelessWidget {
           } else if (state is LoadError) {
             return Center(child: Text('Error: ${state.message}'));
           }
-          return const Center(child: Text('Unknown state'));
+          return const Center(child: Text('No Employees yet. Add one!'));
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -122,13 +124,20 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     Text(employee.role),
                     const SizedBox(height: 4),
-                    Text(employee.duration),
+                    Text('${employee.startDate} - ${employee.endDate}'),
                   ],
                 ),
                 shape: Border(
                   top: BorderSide(color: Colors.grey.shade300),
                   bottom: BorderSide(color: Colors.grey.shade300),
                 ),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => FormScreen(employeeModel: employee),
+                    ),
+                  );
+                },
               ),
             );
           },

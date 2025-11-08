@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$EmployeeModel {
 
- String get id; String get name; String get role; String get duration; bool get active;
+ String get id; String get name; String get role; String get startDate; String get endDate; bool get active;
 /// Create a copy of EmployeeModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $EmployeeModelCopyWith<EmployeeModel> get copyWith => _$EmployeeModelCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is EmployeeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.role, role) || other.role == role)&&(identical(other.duration, duration) || other.duration == duration)&&(identical(other.active, active) || other.active == active));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is EmployeeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.role, role) || other.role == role)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.active, active) || other.active == active));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,name,role,duration,active);
+int get hashCode => Object.hash(runtimeType,id,name,role,startDate,endDate,active);
 
 @override
 String toString() {
-  return 'EmployeeModel(id: $id, name: $name, role: $role, duration: $duration, active: $active)';
+  return 'EmployeeModel(id: $id, name: $name, role: $role, startDate: $startDate, endDate: $endDate, active: $active)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $EmployeeModelCopyWith<$Res>  {
   factory $EmployeeModelCopyWith(EmployeeModel value, $Res Function(EmployeeModel) _then) = _$EmployeeModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String role, String duration, bool active
+ String id, String name, String role, String startDate, String endDate, bool active
 });
 
 
@@ -62,12 +62,13 @@ class _$EmployeeModelCopyWithImpl<$Res>
 
 /// Create a copy of EmployeeModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? role = null,Object? duration = null,Object? active = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? role = null,Object? startDate = null,Object? endDate = null,Object? active = null,}) {
   return _then(EmployeeModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
-as String,duration: null == duration ? _self.duration : duration // ignore: cast_nullable_to_non_nullable
+as String,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
+as String,endDate: null == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
 as String,active: null == active ? _self.active : active // ignore: cast_nullable_to_non_nullable
 as bool,
   ));

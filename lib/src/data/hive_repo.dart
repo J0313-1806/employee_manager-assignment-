@@ -4,9 +4,11 @@ import 'package:hive_ce_flutter/hive_flutter.dart';
 
 class HiveRepository {
 
+   HiveRepository({required Box<EmployeeModel> box}) : _employeeBox = box;
+
   // Use a constant for the box name
-  static const String _employeeBoxName = 'employees';
-  final Box<EmployeeModel> _employeeBox = Hive.box<EmployeeModel>(_employeeBoxName);
+  // static const String _employeeBoxName = 'employees';
+  final Box<EmployeeModel> _employeeBox;
 
   // C - Create/Add EmployeeModel
   Future<void> addEmployee(EmployeeModel employee) async {

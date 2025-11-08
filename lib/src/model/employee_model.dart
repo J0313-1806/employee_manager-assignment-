@@ -17,15 +17,20 @@ class EmployeeModel extends HiveObject with _$EmployeeModel {
   final String role;
   @override
   @HiveField(3)
-  final String duration;
+  final String startDate;
+  @override
   @HiveField(4)
+  final String endDate;
+  @override
+  @HiveField(5)
   final bool active;
 
   EmployeeModel({
     required this.id,
     required this.name,
     required this.role,
-    required this.duration,
+    required this.startDate,
+    required this.endDate,
     required this.active,
   });
 }

@@ -20,15 +20,16 @@ class EmployeeModelAdapter extends TypeAdapter<EmployeeModel> {
       id: fields[0] as String,
       name: fields[1] as String,
       role: fields[2] as String,
-      duration: fields[3] as String,
-      active: fields[4] as bool,
+      startDate: fields[3] as String,
+      endDate: fields[4] as String,
+      active: fields[5] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, EmployeeModel obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -36,8 +37,10 @@ class EmployeeModelAdapter extends TypeAdapter<EmployeeModel> {
       ..writeByte(2)
       ..write(obj.role)
       ..writeByte(3)
-      ..write(obj.duration)
+      ..write(obj.startDate)
       ..writeByte(4)
+      ..write(obj.endDate)
+      ..writeByte(5)
       ..write(obj.active);
   }
 
