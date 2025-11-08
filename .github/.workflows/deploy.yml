@@ -1,21 +1,28 @@
-name: Deploy to GitHub Pages
+name: Deploy Flutter Web to GitHub Pages
 
 on:
   push:
     branches:
-      - main # The branch you push your source code to
+      - main # Workflow runs on push to main branch
 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Deploy Flutter App
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Deploy Flutter Web App
         uses: bluefireteam/flutter-gh-pages@v4
         with:
-          # CRITICAL: Replace 'your_repository_name' with your actual repo name
-          baseHref: /employee_manager-assignment-/ 
-          # The token is automatically available
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # IMPORTANT: Replace 'your_repo_name' with the actual repository name
+          baseHref: /employee_manager-assignment-/
