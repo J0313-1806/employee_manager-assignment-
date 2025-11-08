@@ -16,6 +16,6 @@ jobs:
         uses: bluefireteam/flutter-gh-pages@v4
         with:
           # CRITICAL: Replace 'your_repository_name' with your actual repo name
-          baseHref: /your_repository_name/ 
+          baseHref: /employee_manager-assignment-/ 
           # The token is automatically available
           token: ${{ secrets.GITHUB_TOKEN }}
