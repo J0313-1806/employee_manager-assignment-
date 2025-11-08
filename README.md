@@ -7,7 +7,7 @@ A new Flutter project.
 Employee Manager application
 - BloC state management
 - Persistent storage using Hive
-- Web version: 
+- Web version: [Employee Manager](https://j0313-1806.github.io/employee_manager-assignment-/)
 
 
 For help getting started with Flutter development, view the
