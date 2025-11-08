@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 
-// final HiveRepository hiveRepository = HiveRepository();
 void main() async {
   await Hive.initFlutter();
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-// This class is used as a sentinel value to indicate "Cancel" was pressed.
 class _CancelToken {
   const _CancelToken();
 }
@@ -10,26 +9,21 @@ class _CancelToken {
 ///
 /// Returns a [DateTime] if a date is saved.
 /// Returns `null` if "No date" is saved.
-/// Returns a [_CancelToken] if the dialog is cancelled.
 Future<dynamic> showCustomDatePicker({
   required BuildContext context,
   DateTime? initialDate,
   required Function onSave,
-  // required Function onCancel,
   DateTime? startDate,
   required bool isStart,
 }) {
   return showDialog(
     context: context,
     builder: (BuildContext dialogContext) {
-      // 1. Calculate max width based on screen size
       final screenWidth = MediaQuery.of(dialogContext).size.width;
-      // Set the max width to 360 (standard size) or 80% of the screen width, whichever is smaller.
       final double maxWidth = screenWidth > 360 ? 360 : screenWidth * 0.8;
 
       return AlertDialog(
         contentPadding: EdgeInsets.zero,
-        // Apply constraints here to ensure the AlertDialog itself respects the max width.
         content: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxWidth),
           child: Builder(
@@ -39,7 +33,6 @@ Future<dynamic> showCustomDatePicker({
                 startDate: startDate,
                 isStart: isStart,
                 onCancel: () {
-                  // onCancel;
                   Navigator.of(dialogContext).pop(const _CancelToken());
                 },
                 onSave: (DateTime? newDate) {
@@ -146,8 +139,7 @@ class _DatePickerDialogContentState extends State<_DatePickerDialogContent> {
                     onPressed: () {
                       setState(() {
                         _selectedDate = nextDay;
-                        _isTodaySelected =
-                            false; // "Today" is no longer selected
+                        _isTodaySelected = false;
                       });
                     },
                   ),
@@ -166,8 +158,7 @@ class _DatePickerDialogContentState extends State<_DatePickerDialogContent> {
                     onPressed: () {
                       setState(() {
                         _selectedDate = dayAfterTomorrow;
-                        _isTodaySelected =
-                            false; // "Today" is no longer selected
+                        _isTodaySelected = false;
                       });
                     },
                   ),
@@ -204,7 +195,7 @@ class _DatePickerDialogContentState extends State<_DatePickerDialogContent> {
                 onPressed: () {
                   setState(() {
                     _selectedDate = null;
-                    _isTodaySelected = false; // "Today" is no longer selected
+                    _isTodaySelected = false;
                   });
                 },
               ),
@@ -255,28 +246,21 @@ class _DatePickerDialogContentState extends State<_DatePickerDialogContent> {
           );
   }
 
-  // --- Core Calendar Picker (Built-in Widget) ---
   Widget _buildCalendarPicker(BuildContext context) {
-    // Determine the date to show when the picker first opens.
     final dateToHighlight = _selectedDate == null
         ? DateTime.now()
         : _selectedDate == null && !_isStart
         ? DateTime.now().add(Duration(days: 1))
         : _selectedDate!;
 
-    // Custom Theme wrapper to ensure the CalendarDatePicker uses the desired colors
     return Theme(
       data: Theme.of(context).copyWith(
-        // Set colors for the picker itself
         colorScheme: Theme.of(context).colorScheme.copyWith(
-          primary: Theme.of(
-            context,
-          ).primaryColor, // Header background, selection bubble
-          onPrimary: Colors.white, // Text on primary background
-          surface: Colors.white, // Picker background
-          onSurface: Colors.black87, // Text color for dates
+          primary: Theme.of(context).primaryColor,
+          onPrimary: Colors.white,
+          surface: Colors.white,
+          onSurface: Colors.black87,
         ),
-        // Set text button style (used for month/year navigation buttons)
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
             foregroundColor: Theme.of(context).primaryColor,
@@ -286,11 +270,11 @@ class _DatePickerDialogContentState extends State<_DatePickerDialogContent> {
       child: CalendarDatePicker(
         initialDate: _isStart
             ? dateToHighlight
-            : _startDate!.add(Duration(days: 1)), // Use the selected date here for highlighting
-        // Define the acceptable date range
+            : _startDate!.add(Duration(days: 1)),
+
         firstDate: DateTime(1900),
         lastDate: DateTime(2100),
-        // This is the core callback for date changes
+
         onDateChanged: (DateTime newDate) {
           setState(() {
             _selectedDate = newDate;
@@ -308,8 +292,6 @@ class _DatePickerDialogContentState extends State<_DatePickerDialogContent> {
     );
   }
 
-  // --- Bottom Action Bar Builder ---
-
   Widget _buildBottomBar() {
     return Container(
       padding: const EdgeInsets.all(16.0),
@@ -319,7 +301,6 @@ class _DatePickerDialogContentState extends State<_DatePickerDialogContent> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Left Side: Selected Date
           Expanded(
             child: Row(
               children: [
@@ -336,16 +317,14 @@ class _DatePickerDialogContentState extends State<_DatePickerDialogContent> {
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
-                    overflow:
-                        TextOverflow.ellipsis, // Ensures text fits cleanly
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
           ),
-          // Right Side: Action Buttons
+
           Row(
-            // We use mainAxisSize.min here so the Row only takes up the space needed for the buttons
             mainAxisSize: MainAxisSize.min,
             children: [
               TextButton(
@@ -373,20 +352,11 @@ class _DatePickerDialogContentState extends State<_DatePickerDialogContent> {
 
   @override
   Widget build(BuildContext context) {
-    // Get screen height and width from the context
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // Calculate dynamic height for the CalendarDatePicker
-    // - On small screens (e.g., mobile portrait), use 50% of screen height, but
-    //   limit it to a maximum of 350.
-    // - On large screens, the maximum of 350 will apply.
     final double calendarHeight = (screenHeight * 0.50).clamp(300.0, 350.0);
 
-    // Calculate dynamic width for the CalendarDatePicker
-    // Use the available width minus padding (32.0 total padding)
-    // We use the full dialog width minus padding because the ConstrainedBox
-    // in the AlertDialog wrapper has already determined the max width.
     final double calendarWidth = screenWidth > 360
         ? 360 - 32
         : screenWidth * 0.8 - 32;
@@ -396,21 +366,17 @@ class _DatePickerDialogContentState extends State<_DatePickerDialogContent> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 1. Top Toggle: "No date" / "Today"
           _buildTopToggle(_isStart),
 
-          // 2. The Standard CalendarDatePicker
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: SizedBox(
-              // Apply dynamic height and width here
               height: calendarHeight,
               width: calendarWidth,
               child: _buildCalendarPicker(context),
             ),
           ),
 
-          // 3. Bottom Action Bar
           _buildBottomBar(),
         ],
       ),
